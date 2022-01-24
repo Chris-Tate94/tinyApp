@@ -19,6 +19,11 @@
   <body>
     <main style="margin: 1em">
       <h3>My URLs</h3>
+      <thread>
+        <tr>
+          <li href="#">Create New Short URL</li>
+        </tr>
+      </thread>
       <table class="table">
         <thead>
           <tr>
@@ -26,6 +31,7 @@
             <th scope="col">Long URL</th>
           </tr>
         </thead>
+
         <tbody>
           <% for(let url in urls) { %>
           <tr>
