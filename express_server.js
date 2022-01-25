@@ -13,8 +13,8 @@ app.set("view engine", "ejs");
 
 //holds the "Long" URLS
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
+  b2xVn2: "http://www.lighthouselabs.ca",
 };
 
 app.get("/", (req, res) => {
@@ -56,6 +56,12 @@ app.post("/urls", (req, res) => {
   const templateVars = { shortURL: shortURL, longURL: longURL };
 
   res.render("urls_show", templateVars);
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
