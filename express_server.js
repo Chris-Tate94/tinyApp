@@ -1,10 +1,10 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-
 const cookieParser = require("cookie-parser");
 
 app.use(cookieParser());
+app.set("view engine", "ejs");
 
 const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
@@ -12,8 +12,6 @@ const generateRandomString = () => {
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.set("view engine", "ejs");
 
 //holds the "Long" URLS
 const urlDatabase = {
@@ -89,7 +87,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/login", (req, res) => {
   //gets the req.body.username from the header.ejs form to log in
   const signinID = req.body.username;
+  //use signin ID to set the cookie as the username
   res.cookie("username", signinID);
+  res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
   res.redirect("/urls");
 });
 
