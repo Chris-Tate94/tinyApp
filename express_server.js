@@ -10,6 +10,15 @@ const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
 };
 
+//used to Verify if email already exists in the database
+const emailCheck = function (email, users) {
+  for (const user in users) {
+    if (email === users[user].email) {
+      return true;
+    }
+  }
+};
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -17,6 +26,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const urlDatabase = {
   "9sm5xK": "http://www.google.com",
   b2xVn2: "http://www.lighthouselabs.ca",
+};
+
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
 };
 
 app.get("/", (req, res) => {
@@ -29,7 +51,7 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
     urls: urlDatabase,
   };
   res.render("urls_index", templateVars);
@@ -37,14 +59,14 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
   };
@@ -58,9 +80,35 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  const user_id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  if (email === "" || password === "") {
+    // return res.send("Email and/or Password field cannot be blank");
+
+    return res.send(400);
+  }
+
+  if (emailCheck(email, users)) {
+    // return res.send("Email already in use");
+    return res.send(400);
+  }
+
+  const user = {
+    user_id,
+    email,
+    password,
+  };
+  users[user_id] = user;
+
+  res.cookie("user_id", user_id);
+  res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
@@ -73,7 +121,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = longURL;
 
   const templateVars = {
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     shortURL: shortURL,
     longURL: longURL,
   };
@@ -97,14 +145,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
   //gets the req.body.username from the header.ejs form to log in
-  const signinID = req.body.username;
+  const signinID = req.body.user_id;
   //use signin ID to set the cookie as the username
-  res.cookie("username", signinID);
+  res.cookie("user_id", signinID);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
