@@ -289,6 +289,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   const { shortURL } = req.params;
 
   const urlObj = urlDatabase[shortURL];
+
   if (!urlObj) {
     return res.status(400).send("Url does not exist");
   }
@@ -324,6 +325,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const validUser = users[user_id];
   if (!validUser) {
     return res.redirect("/login");
+  }
+
+  const { shortURL } = req.params;
+
+  const urlObj = urlDatabase[shortURL];
+
+  const urlBelongsToUser = urlObj.userID === validUser.id;
+  if (!urlBelongsToUser) {
+    return res.status(400).send("Url does not belong to user");
   }
 
   delete urlDatabase[req.params.shortURL];
