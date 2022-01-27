@@ -130,7 +130,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = longURL;
 
   const templateVars = {
-    username: req.cookies["user_id"],
+    user: users[req.cookies["user_id"]],
     shortURL: shortURL,
     longURL: longURL,
   };
@@ -159,12 +159,12 @@ app.post("/login", (req, res) => {
   if (email === "" || password === "") return res.send(400);
 
   const validUser = getUser(email, password, users);
-  //console.log(`Valid user`, validUser);
+  console.log(`Valid user`, validUser);
   if (!validUser) {
     return res.send("Invalid credentials");
   }
 
-  res.cookie("user_id", validUser["id"]);
+  res.cookie("user_id", validUser["user_id"]);
   res.redirect("/urls");
 });
 
