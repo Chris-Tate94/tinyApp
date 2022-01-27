@@ -19,14 +19,14 @@
   <body>
     <%- include('partials/_header') %>
     <main style="margin: 1em">
-      <h3>Create Account</h3>
+      <h3>Log in</h3>
       <div>
-        <form method="POST" action="/register">
+        <form method="POST" action="/login">
           <input name="email" placeholder="Email" type="email" />
           <div>
             <input name="password" placeholder="Password" type="password" />
           </div>
-          <button type="submit" class="btn btn-primary">Register</button>
+          <button type="submit" class="btn btn-primary">Login</button>
         </form>
       </div>
     </main>

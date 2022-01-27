@@ -21,8 +21,7 @@
       <div>
         <% if(user){ %>
         <div>
-          <form method="POST" action="/login">
-            <input name="user_id" placeholder="Username" type="text" />
+          <form method="POST" action="/logout">
             <button type="submit" class="btn btn-danger">Log out</button>
           </form>
           <div>
@@ -31,9 +30,8 @@
         </div>
         <% } else{ %>
         <div>
-          <form method="POST" action="/login">
-            <input name="user_id" placeholder="Username" type="text" />
-            <button type="submit" class="btn btn-primary">Sign In</button>
+          <form method="GET" action="/login">
+            <button type="submit" class="btn btn-primary">Log in</button>
           </form>
         </div>
         <div>
