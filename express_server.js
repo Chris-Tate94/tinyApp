@@ -17,6 +17,15 @@ const emailCheck = function (email, users) {
       return true;
     }
   }
+  return false;
+};
+const getUser = function (email, password, users) {
+  for (const user in users) {
+    if (email === users[user].email && password === users[user].password) {
+      return users[user];
+    }
+  }
+  return false;
 };
 
 const bodyParser = require("body-parser");
@@ -78,6 +87,13 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]],
+  };
+  res.render("urls_login", templateVars);
+});
+
 app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]],
@@ -89,16 +105,9 @@ app.post("/register", (req, res) => {
   const user_id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-  if (email === "" || password === "") {
-    // return res.send("Email and/or Password field cannot be blank");
+  if (email === "" || password === "") return res.send(400);
 
-    return res.send(400);
-  }
-
-  if (emailCheck(email, users)) {
-    // return res.send("Email already in use");
-    return res.send(400);
-  }
+  if (emailCheck(email, users)) return res.send(400);
 
   const user = {
     user_id,
@@ -144,10 +153,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  //gets the req.body.username from the header.ejs form to log in
-  const signinID = req.body.user_id;
-  //use signin ID to set the cookie as the username
-  res.cookie("user_id", signinID);
+  const email = req.body.email;
+  const password = req.body.password;
+  //console.log(`email: ${email}, Password ${password}`);
+  if (email === "" || password === "") return res.send(400);
+
+  const validUser = getUser(email, password, users);
+  //console.log(`Valid user`, validUser);
+  if (!validUser) {
+    return res.send("Invalid credentials");
+  }
+
+  res.cookie("user_id", validUser["id"]);
   res.redirect("/urls");
 });
 
