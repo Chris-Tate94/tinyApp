@@ -20,7 +20,9 @@ const emailCheck = function (email, db) {
 
 const getUser = function (email, password, db) {
   for (const user in db) {
-    if (email === db[user].email && password === db[user].password) {
+    const emailExists = email === db[user].email;
+    const passwordMatch = bcrypt.compareSync(password, db[user].password);
+    if (emailExists && passwordMatch) {
       return db[user];
     }
   }
@@ -203,11 +205,12 @@ app.post("/register", (req, res) => {
   }
 
   const id = generateRandomString();
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   users[id] = {
     id,
     email,
-    password,
+    password: hashedPassword,
   };
 
   res.cookie("user_id", id);
