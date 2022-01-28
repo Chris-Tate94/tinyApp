@@ -39,8 +39,6 @@ app.use(
   cookieSession({
     name: "session",
     keys: ["Key1", "Key2"],
-
-    // Cookie Options
   })
 );
 
