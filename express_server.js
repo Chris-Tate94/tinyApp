@@ -1,9 +1,8 @@
 //REQUIRMENTS
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
-
+const cookieSession = require("cookie-session");
 const generateRandomString = () => {
   return Math.random().toString(36).slice(2, 8);
 };
@@ -35,7 +34,16 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["Key1", "Key2"],
+
+    // Cookie Options
+  })
+);
+
 app.set("view engine", "ejs");
 
 //holds the "Long" URLS
@@ -77,7 +85,7 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/register", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
 
   //user validation
   const validUser = users[user_id];
@@ -93,7 +101,7 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
 
   //user validation
   const validUser = users[user_id];
@@ -109,7 +117,7 @@ app.get("/login", (req, res) => {
 
 app.get("/urls", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (!user_id) {
     return res.redirect("/login");
   }
@@ -129,7 +137,7 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (!user_id) {
     return res.redirect("/login");
   }
@@ -149,7 +157,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (!user_id) {
     return res.redirect("/login");
   }
@@ -187,7 +195,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.post("/register", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (user_id) {
     return res.redirect("/urls");
   }
@@ -213,13 +221,13 @@ app.post("/register", (req, res) => {
     password: hashedPassword,
   };
 
-  res.cookie("user_id", id);
+  req.session.user_id = id;
   res.redirect("/urls");
 });
 
 app.post("/login", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (user_id) {
     return res.redirect("/urls");
   }
@@ -236,12 +244,12 @@ app.post("/login", (req, res) => {
     return res.send("Invalid credentials");
   }
 
-  res.cookie("user_id", validUser.id);
+  req.session.user_id = validUser.id;
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -249,7 +257,7 @@ app.post("/logout", (req, res) => {
 
 app.post("/urls", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (!user_id) {
     return res.redirect("/login");
   }
@@ -278,7 +286,7 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:shortURL/edit", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (!user_id) {
     return res.redirect("/login");
   }
@@ -319,7 +327,7 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 // Deletes a short url and its long url counterpart
 app.post("/urls/:shortURL/delete", (req, res) => {
   //cookie validation
-  const { user_id } = req.cookies;
+  const { user_id } = req.session;
   if (!user_id) {
     return res.redirect("/login");
   }
