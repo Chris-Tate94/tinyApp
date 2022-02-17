@@ -72,7 +72,19 @@ const users = {
 // ROUTE HANDLERS
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  //cookie validation
+  const { user_id } = req.session;
+
+  //user validation
+  const validUser = users[user_id];
+  if (validUser) {
+    return res.redirect("/urls");
+  }
+
+  const templateVars = {
+    user: null,
+  };
+  res.render("urls_login", templateVars);
 });
 
 app.get("/urls.json", (req, res) => {
@@ -117,7 +129,9 @@ app.get("/urls", (req, res) => {
   //cookie validation
   const { user_id } = req.session;
   if (!user_id) {
-    return res.redirect("/login");
+    res.status(400).send("No user logged in");
+
+    // return res.redirect("/login");
   }
 
   //user validation
@@ -157,7 +171,8 @@ app.get("/urls/:shortURL", (req, res) => {
   //cookie validation
   const { user_id } = req.session;
   if (!user_id) {
-    return res.redirect("/login");
+    res.status(400).send("No user logged in");
+    //return res.redirect("/login");
   }
 
   //user validation
