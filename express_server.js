@@ -3,30 +3,11 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
-const generateRandomString = () => {
-  return Math.random().toString(36).slice(2, 8);
-};
-
-//used to Verify if email already exists in the database
-const emailCheck = function (email, db) {
-  for (const user in db) {
-    if (email === db[user].email) {
-      return true;
-    }
-  }
-  return false;
-};
-
-const getUser = function (email, password, db) {
-  for (const user in db) {
-    const emailExists = email === db[user].email;
-    const passwordMatch = bcrypt.compareSync(password, db[user].password);
-    if (emailExists && passwordMatch) {
-      return db[user];
-    }
-  }
-  return null;
-};
+const { generateRandomString } = require("./helpers");
+const { emailCheck } = require("./helpers");
+const { getUser } = require("./helpers");
+const { getURLSForUser } = require("./helpers");
+const { urlDatabase } = require("./helpers");
 
 //MIDDLEWARE & SERVER SETTINGS
 
@@ -45,16 +26,16 @@ app.use(
 app.set("view engine", "ejs");
 
 //holds the "Long" URLS
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
+// const urlDatabase = {
+//   b6UTxQ: {
+//     longURL: "https://www.tsn.ca",
+//     userID: "aJ48lW",
+//   },
+//   i3BoGr: {
+//     longURL: "https://www.google.ca",
+//     userID: "aJ48lW",
+//   },
+// };
 
 const users = {
   userRandomID: {
@@ -140,9 +121,11 @@ app.get("/urls", (req, res) => {
     return res.redirect("/login");
   }
 
+  const urls = getURLSForUser(user_id);
+
   const templateVars = {
     user: validUser,
-    urls: urlDatabase,
+    urls: urls,
   };
   res.render("urls_index", templateVars);
 });

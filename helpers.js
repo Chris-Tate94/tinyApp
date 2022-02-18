@@ -1,4 +1,18 @@
 //used to Verify if email already exists in the database
+
+const bcrypt = require("bcryptjs");
+
+const urlDatabase = {
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+};
+
 const emailCheck = function (email, db) {
   for (const user in db) {
     if (email === db[user].email) {
@@ -18,5 +32,25 @@ const getUser = function (email, password, db) {
   }
   return null;
 };
+const generateRandomString = () => {
+  return Math.random().toString(36).slice(2, 8);
+};
 
-module.exports = { emailCheck, getUser };
+const getURLSForUser = function (userId) {
+  const output = {};
+
+  for (let shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === userId) {
+      output[shortURL] = urlDatabase[shortURL].longURL;
+    }
+  }
+  return output;
+};
+
+module.exports = {
+  emailCheck,
+  getUser,
+  generateRandomString,
+  getURLSForUser,
+  urlDatabase,
+};
