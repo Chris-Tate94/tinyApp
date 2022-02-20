@@ -25,18 +25,6 @@ app.use(
 
 app.set("view engine", "ejs");
 
-//holds the "Long" URLS
-// const urlDatabase = {
-//   b6UTxQ: {
-//     longURL: "https://www.tsn.ca",
-//     userID: "aJ48lW",
-//   },
-//   i3BoGr: {
-//     longURL: "https://www.google.ca",
-//     userID: "aJ48lW",
-//   },
-// };
-
 const users = {
   userRandomID: {
     id: "userRandomID",
@@ -170,6 +158,13 @@ app.get("/urls/:shortURL", (req, res) => {
     return res.status(400).send("URL does not exist");
   }
 
+  const urlObj = urlDatabase[shortURL];
+
+  const urlBelongsToUser = urlObj.userID === validUser.id;
+  if (!urlBelongsToUser) {
+    return res.status(400).send("Url does not belong to user");
+  }
+
   const templateVars = {
     user: validUser,
     shortURL: shortURL,
@@ -184,6 +179,7 @@ app.get("/u/:shortURL", (req, res) => {
   if (!validURL) {
     return res.status(400).send("URL does not exist");
   }
+
   res.redirect(validURL);
 });
 
