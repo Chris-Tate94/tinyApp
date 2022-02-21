@@ -174,8 +174,10 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const { shortURL } = req.params.shortURL;
-  const validURL = urlDatabase[shortURL];
+  const { shortURL } = req.params;
+  console.log(shortURL);
+  const validURL = urlDatabase[shortURL].longURL;
+
   if (!validURL) {
     return res.status(400).send("URL does not exist");
   }
